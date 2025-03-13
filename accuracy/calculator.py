@@ -6,4 +6,11 @@ def calculate_accuracy(scan_results : list[bool]) -> float:
     :param scan_results: The list of boolean values representing the scan results
     """
 
+    # Filter for none elements
+    filtered_results = [res for res in scan_results if res is not None]
+
+    # Divide by zero is not supported
+    if not filtered_results:
+        raise ZeroDivisionError("The scan results are empty")
+
     return sum(scan_results) / len(scan_results) * 100
