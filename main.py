@@ -48,4 +48,5 @@ if __name__ == '__main__':
         accuracy = calculate_accuracy(scan_results)
     except ZeroDivisionError:
         print("The scan results are empty. Divide by zero is not allowed.")
+
     print(f"Die Genauigkeit des Scanners beträgt {accuracy} %")
