@@ -11,6 +11,6 @@ def calculate_accuracy(scan_results : list[bool]) -> float:
 
     # Divide by zero is not supported
     if not filtered_results:
-        raise ZeroDivisionError("The scan results are empty")
+        raise ZeroDivisionError("Die Liste ist leer. Eine Division durch 0 ist nicht erlaubt.")
 
     return sum(scan_results) / len(scan_results) * 100

@@ -33,7 +33,7 @@ if __name__ == '__main__':
         text_file_stem = text_file.stem
         for jpg_file in jpg_files:
             if text_file_stem in jpg_file.name:
-                text_image_pairs[text_file.name] = jpg_file.name
+                text_image_pairs[text_file] = jpg_file
 
     # Iterate over file pairs and scan the image
     for text_file, image_file in text_image_pairs.items():
@@ -47,6 +47,6 @@ if __name__ == '__main__':
     try:
         accuracy = calculate_accuracy(scan_results)
     except ZeroDivisionError:
-        print("The scan results are empty. Divide by zero is not allowed.")
+        print("Die Liste ist leer. Eine Division durch 0 ist nicht erlaubt.")
 
     print(f"Die Genauigkeit des Scanners beträgt {accuracy} %")
