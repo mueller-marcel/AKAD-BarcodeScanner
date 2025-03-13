@@ -1,2 +1,4 @@
 if __name__ == '__main__':
-    print("Hello World")
+
+    # Create a list to store scan results
+    scan_results : list[bool]
