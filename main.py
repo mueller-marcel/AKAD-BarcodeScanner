@@ -1,9 +1,11 @@
-import sys
-from accuracy.calculator import calculate_accuracy
-from barcode.scanner import scan_barcode
 from pathlib import Path
+from accuracy.calculator import calculate_accuracy
+from barcode.scanner import BarcodeScanner
 
 if __name__ == '__main__':
+
+    # Instantiate the barcode scanner
+    scanner = BarcodeScanner()
 
     # Create a list to store scan results
     scan_results : list[bool] = []
@@ -11,18 +13,8 @@ if __name__ == '__main__':
     # Create a dictionary to with the file pairs
     text_image_pairs : dict[str, str] = {}
 
-    # Ask user for the dataset to be analyzed
-    print("Welchen Datensatz möchten Sie analysieren? Geben Sie '1' oder '2' ein")
-    user_selection = input()
-    if user_selection == '1':
-        print("Der erste Datensatz wird gescannt.")
-        directory = Path("Dataset1")
-    elif user_selection == '2':
-        print("Der zweite Datensatz wird gescannt.")
-        directory = Path("Dataset2")
-    else:
-        print("Die Eingabe konnte nicht verarbeitet werden. Das Programm wird beendet.")
-        sys.exit()
+    # Define base directory for dataset 1
+    directory = Path("Dataset1")
 
     # Get the image files
     jpg_files = [file for file in directory.glob("*.jpg")]
@@ -39,7 +31,7 @@ if __name__ == '__main__':
     for text_file, image_file in text_image_pairs.items():
         print(f"Scanne {image_file} und vergleiche sie mit {text_file}")
 
-        result = scan_barcode(image_file, text_file)
+        result = scanner.scan_barcode(image_file, text_file)
         scan_results.append(result)
 
     # Calculate the accuracy based on the scan results
