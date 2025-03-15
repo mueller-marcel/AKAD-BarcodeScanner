@@ -11,8 +11,8 @@ def scan_barcode(image_path: str, text_file_path: str) -> bool:
     :param text_file_path: The path to the text file in txt format
     """
 
-    # Load the image using grayscale
-    image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+    # Load the image
+    image = cv2.imread(image_path)
 
     # Preprocess the image
     image = preprocess_image(image)
@@ -26,8 +26,11 @@ def preprocess_image(image: np.ndarray) -> np.ndarray:
     :return: The preprocessed image of the barcode only
     """
 
+    # Convert the image to gray image
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
     # Create a binary image
-    _, binary_image = cv2.threshold(image, 128, 255, cv2.THRESH_BINARY)
+    _, binary_image = cv2.threshold(gray, 128, 255, cv2.THRESH_BINARY)
 
     # Show image
     cv2.imshow("Detected", binary_image)
