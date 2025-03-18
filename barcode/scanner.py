@@ -43,10 +43,50 @@ class BarcodeScanner:
         # Convert the image to gray image
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-        # Create a binary image
-        _, binary_image = cv2.threshold(gray, 128, 255, cv2.THRESH_BINARY)
+        # Calculate the gradients
+        grad_x = cv2.Scharr(gray, cv2.CV_64F, 1, 0)
+        grad_y = cv2.Scharr(gray, cv2.CV_64F, 0, 1)
+        gradient = cv2.subtract(grad_x, grad_y)
+        gradient = cv2.convertScaleAbs(gradient)
 
-        return binary_image
+        # Blur the image to reduce noise
+        blurred = cv2.blur(gradient, (9, 9))
+
+        # Threshold the image
+        _, thresh = cv2.threshold(blurred, 128, 255, cv2.THRESH_BINARY)
+
+        # Morphological operation
+        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (21, 7))
+        closed = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel)
+
+        # Erode and dilate
+        closed = cv2.erode(closed, kernel, iterations=4)
+        closed = cv2.dilate(closed, kernel, iterations=4)
+
+        # Find contours in the thresholded image
+        contours, _ = cv2.findContours(closed.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+        # If no contours were found, exit
+        if not contours:
+            print("No barcode found")
+            exit()
+
+        # Sort the contours by area, keeping the largest one
+        c = sorted(contours, key=cv2.contourArea, reverse=True)[0]
+
+        # Compute the bounding box of the largest contour
+        rect = cv2.minAreaRect(c)
+        box = cv2.boxPoints(rect)
+        box = box.astype(int)
+
+        # Draw a bounding box around the detected barcode
+        cv2.drawContours(image, [box], -1, (0, 255, 0), 3)
+
+        cv2.imshow("Barcode", image)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
+        return gray
 
     @staticmethod
     def __detect_barcode(binary_image: np.ndarray) -> np.ndarray | None:
