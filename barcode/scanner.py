@@ -63,7 +63,7 @@ class BarcodeScanner:
         closed = cv2.erode(closed, kernel, iterations=4)
         closed = cv2.dilate(closed, kernel, iterations=4)
 
-        # Find contours in the thresholded image
+        # Find contours in the threshold image
         contours, _ = cv2.findContours(closed.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
         # If no contours were found, exit
