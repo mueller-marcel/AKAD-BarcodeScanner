@@ -1,6 +1,9 @@
 import cv2
 import numpy as np
 
+from barcode.ModelTrainer import ModelTrainer
+
+
 class BarcodeScanner:
     def __init__(self):
         """
@@ -31,6 +34,15 @@ class BarcodeScanner:
             return False
 
         return True
+
+    @staticmethod
+    def __detect_and_crop_barcode(image: np.ndarray) -> np.ndarray | None:
+        """
+        Detects the barcode in the image using a YOLO v8 model.
+        If the barcode is found, it will be cropped, otherwise it will be None
+        :param image: The image to detect the barcode from
+        """
+        
 
     @staticmethod
     def __preprocess_image(image: np.ndarray) -> np.ndarray:
