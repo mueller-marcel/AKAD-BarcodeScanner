@@ -1,20 +1,11 @@
-import os
 from pathlib import Path
 from accuracy.calculator import calculate_accuracy
-from barcode.ModelTrainer import ModelTrainer
-from barcode.scanner import BarcodeScanner
+from barcode.Scanner import Scanner
 
 if __name__ == '__main__':
 
-    # Get path to data.yaml
-    data_path = os.path.join(os.getcwd(),"yolov8_dataset", "data.yaml")
-
-    # Train the yolo v8 model
-    model_trainer = ModelTrainer()
-    detection_model = model_trainer.train_model(data_path)
-
     # Instantiate the barcode scanner
-    scanner = BarcodeScanner()
+    scanner = Scanner()
 
     # Create a list to store scan results
     scan_results : list[bool] = []

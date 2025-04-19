@@ -1,6 +1,6 @@
 from ultralytics import YOLO
 
-class ModelTrainer:
+class Trainer:
 
     @staticmethod
     def train_model(yolo_model_path : str) -> YOLO:
