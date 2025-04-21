@@ -31,7 +31,7 @@ if __name__ == '__main__':
     for text_file, image_file in text_image_pairs.items():
         print(f"Scanne {image_file} und vergleiche sie mit {text_file}")
 
-        result = scanner.scan_barcode(image_file, text_file)
+        result = scanner.scan_barcode(str(image_file), str(text_file))
         scan_results.append(result)
 
     # Calculate the accuracy based on the scan results
