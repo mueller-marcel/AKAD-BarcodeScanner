@@ -28,7 +28,6 @@ class Scanner:
 
         return True
 
-
     @staticmethod
     def __detect_barcode(image: np.ndarray) -> np.ndarray | None:
         """
@@ -38,24 +37,34 @@ class Scanner:
         """
 
         # Get path to the model and initialize it
-        path_to_model = os.path.join(Path.cwd(), "runs", "detect","train6", "weights", "best.pt")
+        path_to_model = os.path.join(Path.cwd(), "runs", "detect", "train6", "weights", "best.pt")
         model = YOLO(path_to_model)
 
         # Detect the barcode
         results = model(image)
 
         # Draw rectangle around the barcode if found
+        largest_area = 0
+        largest_box = None
         if len(results) > 0:
             for result in results:
                 for box in result.boxes:
-
-                    # Get the coordinates and draw rectangle
                     x1, y1, x2, y2 = map(int, box.xyxy[0])
+                    area = (x2 - x1) * (y2 - y1)
 
-                    cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                    if area > largest_area:
+                        largest_area = area
+                        largest_box = (x1, y1, x2, y2)
 
-        # Show images with rectangles
-        cv2.imshow("Barcodes", image)
-        cv2.waitKey(0)
+        if largest_box is not None:
+            x1, y1, x2, y2 = largest_box
+            cropped_image = image[y1:y2, x1:x2]
 
-        return image
+            # Show images with rectangles
+            cv2.imshow("Barcodes", cropped_image)
+            cv2.waitKey(0)
+
+            return cropped_image
+
+        else:
+            return None
