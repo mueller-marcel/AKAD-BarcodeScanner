@@ -37,7 +37,7 @@ class Scanner:
         """
 
         # Get path to the model and initialize it
-        path_to_model = os.path.join(Path.cwd(), "runs", "detect", "train6", "weights", "best.pt")
+        path_to_model = os.path.join(Path.cwd(), "best.pt")
         model = YOLO(path_to_model)
 
         # Detect the barcode

@@ -1,5 +1,5 @@
 from pathlib import Path
-from accuracy.calculator import calculate_accuracy
+from accuracy.Calculator import Calculator
 from barcode.Scanner import Scanner
 
 if __name__ == '__main__':
@@ -14,7 +14,7 @@ if __name__ == '__main__':
     text_image_pairs : dict[str, str] = {}
 
     # Define base directory for dataset 1
-    directory = Path("Dataset1")
+    directory = Path("dataset")
 
     # Get the image files
     jpg_files = [file for file in directory.glob("*.jpg")]
@@ -37,7 +37,7 @@ if __name__ == '__main__':
     # Calculate the accuracy based on the scan results
     accuracy : float = 0.0
     try:
-        accuracy = calculate_accuracy(scan_results)
+        accuracy = Calculator.calculate_accuracy(scan_results)
     except ZeroDivisionError:
         print("Die Liste ist leer. Eine Division durch 0 ist nicht erlaubt.")
 
