@@ -151,34 +151,63 @@ def viterbi_digit_decoding_left(edge_positions, delta):
         digit_candidates.append(candidates)
 
     T = len(digit_candidates)
-    D = 10  # Digits 0–9
 
-    cost = np.full((T, D), np.inf, dtype=object)
-    path = np.full((T, D), -1, dtype=int)
-    patterns = np.full((T, D), np.inf, dtype=object)
+    # Baue alle States (digit, pattern) flach auf
+    states = []
+    for t in range(T):
+        for (digit, error, pattern) in digit_candidates[t]:
+            states.append((t, digit, pattern))
 
-    for d, err, p in digit_candidates[0]:
-        cost[0, d] = err
+    S = len(states)  # Anzahl aller States über alle Zeitschritte
 
+    # Initialisiere Cost und Path Dictionaries
+    cost = {}
+    path = {}
+
+    # Initialisierung für t=0
+    for i, (t, digit, pattern) in enumerate(states):
+        if t == 0:
+            error = next(e for d, e, p in digit_candidates[0] if d == digit and p == pattern)
+            cost[(t, digit, pattern)] = error
+            path[(t, digit, pattern)] = None
+
+    # Rekursion
     for t in range(1, T):
         for d_curr, err_curr, p_curr in digit_candidates[t]:
-            for d_prev in range(D):
-                c = cost[t - 1, d_prev] + err_curr
-                if c < cost[t, d_curr]:
-                    cost[t, d_curr] = c
-                    path[t, d_curr] = d_prev
-                    patterns[t, d_curr] = p_curr
+            min_cost = np.inf
+            best_prev = None
+            # Suche alle Vorgängerstates aus t-1
+            for d_prev, err_prev, p_prev in digit_candidates[t - 1]:
+                prev_key = (t - 1, d_prev, p_prev)
+                if prev_key in cost:
+                    c = cost[prev_key] + err_curr
+                    curr_key = (t, d_curr, p_curr)
+                    if c < cost.get(curr_key, np.inf):
+                        cost[curr_key] = c
+                        path[curr_key] = prev_key
 
-    final_digit = np.argmin(cost[-1])
-    sequence = [final_digit]
-    for t in reversed(range(1, T)):
-        final_digit = path[t, final_digit]
-        sequence.append(final_digit)
-        final_pattern = patterns[t, final_digit]
-        code = EAN13_LEFT_CODE[final_pattern]
-        pattern_sequence.append(code)
+    # Terminierung: finde finalen State mit minimalen Kosten bei t=T-1
+    final_states = [k for k in cost.keys() if k[0] == T - 1]
+    final_state = min(final_states, key=lambda k: cost[k])
 
-    return list(reversed(sequence)), list(pattern_sequence)
+    # Backtracking
+    sequence = []
+    pattern_sequence = []
+    state = final_state
+    while state is not None:
+        t, digit, pattern = state
+        sequence.append(digit)
+        pattern_sequence.append(pattern)
+        state = path[state]
+
+    sequence.reverse()
+    pattern_sequence.reverse()
+
+    patterns = []
+    for pattern in pattern_sequence:
+        patterns.append(EAN13_LEFT_CODE.get(pattern))
+
+    return list(sequence), list(patterns)
 
 def viterbi_digit_decoding_right(edge_positions, delta):
     digit_candidates = []
