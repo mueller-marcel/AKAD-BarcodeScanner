@@ -1,5 +1,6 @@
 class Calculator:
 
+    @staticmethod
     def calculate_accuracy(scan_results : list[bool]) -> float:
         """
         Calculates the accuracy of the barcode scanner based on a list of boolean values

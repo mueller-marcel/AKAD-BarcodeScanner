@@ -1,70 +1,49 @@
-import os
-from pathlib import Path
-
+from barcode.Decoder import decode_barcode
+from barcode.Detector import detect_barcode
 import cv2
-import numpy as np
-from ultralytics import YOLO
-
 
 class Scanner:
 
-    def scan_barcode(self, image_path: str, text_file_path: str) -> bool:
+    def __init__(self):
         """
-        Retrieves the barcode from the image_path and compares it with the barcode text from
-        the text_file_path. Returns a boolean indicating if the retrieved barcode matches the
-        barcode from the text_file_path.
-        :rtype: bool
-        :param image_path: The path to the image in jpg format
-        :param text_file_path: The path to the text file in txt format
+        Constructs the scanner class that is in charge of preprocessing, detecting and decoding the barcode
         """
-
-        # Load the image
-        image = cv2.imread(image_path)
-
-        # Detect the barcode, if none was found the algorithmus terminates with false
-        barcode_image = self.__detect_barcode(image)
-        if barcode_image is None:
-            return False
-
-        return True
 
     @staticmethod
-    def __detect_barcode(image: np.ndarray) -> np.ndarray | None:
+    def scan_barcode(image_file: str, text_file: str) -> bool:
         """
-        Detect the barcode from the image and returns the barcode from the image.
-        :param image: The image as numpy array.
-        :return: The region of interest (ROI), if a barcode is found, else None
+        Scans the image for a barcode and detects it.
+        Compares the value of the scanned barcode with the original value from the text file
+        :param image_file: The file path to the image
+        :param text_file: The file path to the text file
         """
 
-        # Get path to the model and initialize it
-        path_to_model = os.path.join(Path.cwd(), "best.pt")
-        model = YOLO(path_to_model)
+        # Read the image
+        image = cv2.imread(str(image_file), cv2.IMREAD_GRAYSCALE)
+
+        if image is None:
+            return False
 
         # Detect the barcode
-        results = model(image)
+        cropped_barcode = detect_barcode(image)
 
-        # Draw rectangle around the barcode if found
-        largest_area = 0
-        largest_box = None
-        if len(results) > 0:
-            for result in results:
-                for box in result.boxes:
-                    x1, y1, x2, y2 = map(int, box.xyxy[0])
-                    area = (x2 - x1) * (y2 - y1)
+        if cropped_barcode is None:
+            return False
 
-                    if area > largest_area:
-                        largest_area = area
-                        largest_box = (x1, y1, x2, y2)
+        # Binarize the image
+        _, binary_image = cv2.threshold(cropped_barcode, 127, 255, cv2.THRESH_BINARY)
 
-        if largest_box is not None:
-            x1, y1, x2, y2 = largest_box
-            cropped_image = image[y1:y2, x1:x2]
+        # Decode the barcode
+        digits = decode_barcode(binary_image)
 
-            # Show images with rectangles
-            cv2.imshow("Barcodes", cropped_image)
-            cv2.waitKey(0)
+        if digits is None:
+            return False
 
-            return cropped_image
+        # Read the original barcode from the corresponding text file
+        with open(str(text_file), "r") as file:
+            original_digits = file.read()
 
-        else:
-            return None
+            if original_digits == digits:
+                return True
+
+        return False

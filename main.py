@@ -4,9 +4,6 @@ from barcode.Scanner import Scanner
 
 if __name__ == '__main__':
 
-    # Instantiate the barcode scanner
-    scanner = Scanner()
-
     # Create a list to store scan results
     scan_results : list[bool] = []
 
@@ -25,13 +22,17 @@ if __name__ == '__main__':
         text_file_stem = text_file.stem
         for jpg_file in jpg_files:
             if text_file_stem in jpg_file.name:
-                text_image_pairs[text_file] = jpg_file
+                text_image_pairs[str(text_file)] = str(jpg_file)
 
     # Iterate over file pairs and scan the image
     for text_file, image_file in text_image_pairs.items():
-        print(f"Scanne {image_file} und vergleiche sie mit {text_file}")
+        print(f"Scan {image_file} and compare it with {text_file}")
+        result = Scanner.scan_barcode(image_file, text_file)
+        if result:
+            print(f"The barcode from {image_file} was correctly scanned.")
+        else:
+            print(f"The barcode from {image_file} was not correctly scanned.")
 
-        result = scanner.scan_barcode(str(image_file), str(text_file))
         scan_results.append(result)
 
     # Calculate the accuracy based on the scan results
