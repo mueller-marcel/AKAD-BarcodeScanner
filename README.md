@@ -25,7 +25,7 @@ python3 main.py
 
 ## 📚 Bibliotheken
 
-Es wuerden folgende Bibliotheken für die Lösung der Aufgabe verwendet. Diese werden in der `requirements.txt` angegeben und können über diese Datei installiert werden.
+Es wurden folgende Bibliotheken für die Lösung der Aufgabe verwendet. Diese werden in der `requirements.txt` angegeben und können über diese Datei installiert werden.
 
 - opencv-python
 - numpy
