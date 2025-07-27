@@ -1,40 +1,54 @@
 import cv2.barcode
 import numpy as np
 
-def detect_barcode(image: np.array) -> np.ndarray | None:
-    """
-    Detect the barcode from the image and returns the barcode from the image.
-    :param image: The image as numpy array.
-    :return: The region of interest (ROI), if a barcode is found, else None
-    """
+class Detector:
 
-    # Detect the barcode
-    detector = cv2.barcode.BarcodeDetector()
-    ok, corners = detector.detect(image)
+    def __init__(self):
+        """
+        Constructs an instance of the detector
+        """
 
-    if not ok or corners is None or len(corners) == 0:
-        print("Kein Barcode erkannt.")
-        return None
 
-    # Corner points as integer NumPy points
-    points = corners[0].astype(np.int32)
+    @staticmethod
+    def detect_barcode(image: np.array, rotate_barcode: bool) -> np.ndarray | None:
+        """
+        Detect the barcode from the image and returns the barcode from the image.
+        :param image: The image as numpy array.
+        :param rotate_barcode: If true, rotate the barcode if necessary.
+        :return: The region of interest (ROI), if a barcode is found, else None
+        """
 
-    # Create a rotated rectangle
-    rect = cv2.minAreaRect(points)
-    center, size, angle = rect[0], rect[1], rect[2]
-    center = tuple(map(int, center))
-    size = tuple(map(int, size))
+        # Detect the barcode
+        detector = cv2.barcode.BarcodeDetector()
+        ok, corners = detector.detect(image)
 
-    # Rotate image
-    (h, w) = image.shape[:2]
-    M = cv2.getRotationMatrix2D(center, angle, 1.0)
-    rotated = cv2.warpAffine(image, M, (w, h), flags=cv2.INTER_CUBIC)
+        if not ok or corners is None or len(corners) == 0:
+            print("No barcode recognized")
+            return None
 
-    # Extract the rectangle
-    cropped = cv2.getRectSubPix(rotated, size, center)
+        # Corner points as integer NumPy points
+        points = corners[0].astype(np.int32)
 
-    # Rotate the image if needed
-    if cropped.shape[0] > cropped.shape[1]:
-        cropped = cv2.rotate(cropped, cv2.ROTATE_90_CLOCKWISE)
+        # Create a rotated rectangle
+        rect = cv2.minAreaRect(points)
+        center, size, angle = rect[0], rect[1], rect[2]
+        center = tuple(map(int, center))
+        size = tuple(map(int, size))
 
-    return cropped
+        # Rotate image
+        height, width = image.shape[:2]
+        rotation_matrix = cv2.getRotationMatrix2D(center, angle, 1.0)
+        rotated = cv2.warpAffine(image, rotation_matrix, (width, height), flags=cv2.INTER_CUBIC)
+
+        # Extract the rectangle
+        cropped = cv2.getRectSubPix(rotated, size, center)
+
+        # Rotate the image if needed
+        if cropped.shape[0] > cropped.shape[1]:
+            cropped = cv2.rotate(cropped, cv2.ROTATE_90_CLOCKWISE)
+
+        # Rotate 180 degrees if the barcode is upside down
+        if rotate_barcode:
+            cropped = cv2.rotate(cropped, cv2.ROTATE_180)
+
+        return cropped

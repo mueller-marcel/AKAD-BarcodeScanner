@@ -27,11 +27,17 @@ if __name__ == '__main__':
     # Iterate over file pairs and scan the image
     for text_file, image_file in text_image_pairs.items():
         print(f"Scan {image_file} and compare it with {text_file}")
-        result = Scanner.scan_barcode(image_file, text_file)
+        result = Scanner.scan_barcode(image_file, text_file, rotate_barcode=False)
         if result:
             print(f"The barcode from {image_file} was correctly scanned.")
         else:
-            print(f"The barcode from {image_file} was not correctly scanned.")
+            print(f"The barcode could not be recognized. Attempting to scan it upside down")
+            result = Scanner.scan_barcode(image_file, text_file, rotate_barcode=True)
+
+            if result:
+                print(f"The barcode from {image_file} was correctly scanned.")
+            else:
+                print(f"The barcode from {image_file} was not correctly scanned.")
 
         scan_results.append(result)
 
@@ -42,4 +48,4 @@ if __name__ == '__main__':
     except ZeroDivisionError:
         print("Die Liste ist leer. Eine Division durch 0 ist nicht erlaubt.")
 
-    print(f"Die Genauigkeit des Scanners beträgt {accuracy} %")
+    print(f"The accuracy of the barcode is {accuracy} %")
