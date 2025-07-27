@@ -30,3 +30,7 @@ Es wurden folgende Bibliotheken für die Lösung der Aufgabe verwendet. Diese we
 - opencv-python
 - numpy
 - scipy
+
+> [!NOTE]  
+> Die Abgabe aus dem AKAD Portal enhtält die Bilder und Textdateien des Datensatzes nicht, um die Größe der Abgabe zu reduzieren.
+> Der Datensatz kann hier heruntergeladen werden.
