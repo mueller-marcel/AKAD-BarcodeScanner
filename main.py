@@ -48,4 +48,4 @@ if __name__ == '__main__':
     except ZeroDivisionError:
         print("Die Liste ist leer. Eine Division durch 0 ist nicht erlaubt.")
 
-    print(f"Die Genauigkeit des Scanners beträgt {accuracy} %")
+    print(f"The accuracy of the barcode is {accuracy} %")

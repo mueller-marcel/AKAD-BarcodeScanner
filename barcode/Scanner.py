@@ -1,5 +1,5 @@
-from barcode.Decoder import decode_barcode
-from barcode.Detector import detect_barcode
+from barcode.Decoder import Decoder
+from barcode.Detector import Detector
 import cv2
 
 class Scanner:
@@ -26,7 +26,8 @@ class Scanner:
             return False
 
         # Detect the barcode
-        cropped_barcode = detect_barcode(image, rotate_barcode)
+        detector = Detector()
+        cropped_barcode = detector.detect_barcode(image, rotate_barcode)
 
         if cropped_barcode is None:
             return False
@@ -35,7 +36,8 @@ class Scanner:
         _, binary_image = cv2.threshold(cropped_barcode, 127, 255, cv2.THRESH_BINARY)
 
         # Decode the barcode
-        digits = decode_barcode(binary_image)
+        decoder = Decoder()
+        digits = decoder.decode_barcode(binary_image)
 
         if digits is None:
             return False
