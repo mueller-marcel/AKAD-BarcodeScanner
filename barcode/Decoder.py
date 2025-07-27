@@ -93,26 +93,27 @@ class Decoder:
         results = []
 
         # Extract the scanlines
-        scanlines = self._extract_scanlines(image)
+        scanlines = self._divide_image_to_scanlines(image)
 
         for scanline in scanlines:
+
             # Get the edge signal
-            gradient = self._normalize_gradient(scanline)
+            gradient = self._build_gradient(scanline)
 
             # Find the edges
             edges = self._detect_edges(gradient)
 
             # Estimate the width between the fixed edges
-            delta = self._estimate_module_width(edges)
+            delta = self._estimate_delta(edges)
 
             # Get the fixed edges
             fixed_edges = self._viterbi_edges(gradient, edges, expected_num_edges=60, delta=delta)
 
             # Get the left digits together with their patterns
-            left_digits, pattern = self._viterbi_digit_decoding_left(fixed_edges, delta=delta)
+            left_digits, pattern = self._decode_left_digits(fixed_edges, delta=delta)
 
             # Get the right digits
-            right_digits = self._viterbi_digit_decoding_right(fixed_edges, delta=delta)
+            right_digits = self._decode_right_digits(fixed_edges, delta=delta)
 
             # Concatenate the left and right digits
             possible_digits = left_digits[0:6] + right_digits
@@ -140,7 +141,7 @@ class Decoder:
 
         return None
 
-    def _extract_scanlines(self, image: np.ndarray, num_lines=1) -> list[np.ndarray]:
+    def _divide_image_to_scanlines(self, image: np.ndarray, num_lines=1) -> list[np.ndarray]:
         """
         Extracts scanlines from the binary image of the barcode
         :param image: The image of the barcode
@@ -158,7 +159,7 @@ class Decoder:
 
         return [image[y_coordinate, :] for y_coordinate in y_coordinates]
 
-    def _normalize_gradient(self, scanline: np.ndarray) -> np.ndarray:
+    def _build_gradient(self, scanline: np.ndarray) -> np.ndarray:
         """
         Normalize the gradient of the scan line
         :param scanline: The scan line to normalize
@@ -183,7 +184,7 @@ class Decoder:
 
         return peaks
 
-    def _estimate_module_width(self, edges: np.ndarray) -> float:
+    def _estimate_delta(self, edges: np.ndarray) -> float:
         """
         Estimates the delta between the edges of the barcode
         :param edges: The array of edges
@@ -231,7 +232,7 @@ class Decoder:
 
         return np.array(path[::-1])
 
-    def _viterbi_digit_decoding_left(self, edge_positions: np.ndarray, delta: float):
+    def _decode_left_digits(self, edge_positions: np.ndarray, delta: float):
         """
         Decodes the digit candidates
         :param edge_positions: The edge positions of the scan line
@@ -297,7 +298,7 @@ class Decoder:
 
         return list(sequence), list(patterns)
 
-    def _viterbi_digit_decoding_right(self, edge_positions: np.ndarray, delta: float):
+    def _decode_right_digits(self, edge_positions: np.ndarray, delta: float):
         """
         Decodes the digit candidates from the right side
         :param edge_positions: The positions of the edges
