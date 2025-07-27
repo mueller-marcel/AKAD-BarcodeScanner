@@ -10,12 +10,13 @@ class Scanner:
         """
 
     @staticmethod
-    def scan_barcode(image_file: str, text_file: str) -> bool:
+    def scan_barcode(image_file: str, text_file: str, rotate_barcode: bool) -> bool:
         """
         Scans the image for a barcode and detects it.
         Compares the value of the scanned barcode with the original value from the text file
         :param image_file: The file path to the image
         :param text_file: The file path to the text file
+        :param rotate_barcode: Rotates the barcode 180 degrees after cropping since the barcode rotation can be wrong
         """
 
         # Read the image
@@ -25,7 +26,7 @@ class Scanner:
             return False
 
         # Detect the barcode
-        cropped_barcode = detect_barcode(image)
+        cropped_barcode = detect_barcode(image, rotate_barcode)
 
         if cropped_barcode is None:
             return False

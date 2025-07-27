@@ -1,10 +1,11 @@
 import cv2.barcode
 import numpy as np
 
-def detect_barcode(image: np.array) -> np.ndarray | None:
+def detect_barcode(image: np.array, rotate_barcode: bool) -> np.ndarray | None:
     """
     Detect the barcode from the image and returns the barcode from the image.
     :param image: The image as numpy array.
+    :param rotate_barcode: If true, rotate the barcode if necessary.
     :return: The region of interest (ROI), if a barcode is found, else None
     """
 
@@ -36,5 +37,9 @@ def detect_barcode(image: np.array) -> np.ndarray | None:
     # Rotate the image if needed
     if cropped.shape[0] > cropped.shape[1]:
         cropped = cv2.rotate(cropped, cv2.ROTATE_90_CLOCKWISE)
+
+    # Rotate 180 degrees if the barcode is upside down
+    if rotate_barcode:
+        cropped = cv2.rotate(cropped, cv2.ROTATE_180)
 
     return cropped
